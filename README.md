@@ -8,4 +8,4 @@ Download the Windows executable and place it in a local folder, e.g. C:\Users\to
 
 ![Login](images/login.png)
 
-![App Start]{images/app-start.png)
+![App Start](images/app-start.png)
