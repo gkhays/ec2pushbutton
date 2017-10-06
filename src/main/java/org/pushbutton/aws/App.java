@@ -88,16 +88,18 @@ public class App {
 					launcherFrame.setAwsClient(ec2);
 					launcherFrame.setInstance(i);
 					launcherFrame.startListeners();
-//					launcherFrame.checkStatus();
 					break;
 				}
 			}			
 		} catch (Exception ex) {
 			if (ex instanceof IllegalArgumentException) {
+				System.out.println("Caught IllegalArgumentException");
 				String profileNotFound = "AWS credential profiles file not " +
 						"found in the given path:";
 				if (ex.getMessage().startsWith(profileNotFound)) {
-					Login login = new Login(configFile);
+					System.out.println("Should be showing login form...");
+					Login login = new Login(launcherFrame, configFile);
+					login.setModal(true);
 					login.setVisible(true);
 					
 				}

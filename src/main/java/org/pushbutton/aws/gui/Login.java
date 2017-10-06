@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
@@ -35,9 +36,10 @@ public class Login extends JDialog {
 
 	/**
 	 * Create the dialog.
+	 * @param launcherFrame 
 	 * @param configFile 
 	 */
-	public Login(final File configFile) {
+	public Login(JFrame launcherFrame, final File configFile) {
 		this.configFile = configFile;
 		
 		setBounds(100, 100, 420, 170);
@@ -103,6 +105,15 @@ public class Login extends JDialog {
 					ioe.printStackTrace();
 				}
 			}
+		});
+		
+		cancelButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Login.this.setVisible(false);
+			}
+			
 		});
 	}
 }
