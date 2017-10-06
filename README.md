@@ -1,4 +1,4 @@
-# ED2PushButton
+# EC2PushButton
 
 Simple one button touch to start and stop a given EC2 instance
 
