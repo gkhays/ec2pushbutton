@@ -134,8 +134,9 @@ public class App {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream in = classLoader.getResourceAsStream("app.properties");
 		Properties properties = new Properties();
-		InputStream in = App.class.getResourceAsStream("/app.properties");
 		
 		try {
 			properties.load(in);
