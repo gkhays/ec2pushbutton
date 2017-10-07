@@ -4,7 +4,7 @@ Simple one button touch to start and stop a given EC2 instance.
 
 ## Motivation
 
-This project started with a need to easily start and stop our 7 Days to Die game server. Surprisingly, not everyone wanted to learn how to operate Amazon EC2 instances nor did they want to learn the nuances of Amazon Web Services (AWS) identity and access management (IAM). Consequently this project was born. Given an already created EC2 instance and existing credentials, team members may now start and stop the game server. Stopping is fairly important since we are all not yet strong players and if the server continue to run unchecked, the zombies would continue to get stronger and more aggressive.
+This project started with a need to easily start and stop our [7 Days to Die game server](http://store.steampowered.com/app/251570/7_Days_to_Die/). Surprisingly, not everyone wanted to learn how to operate Amazon EC2 instances nor did they want to learn the nuances of Amazon Web Services (AWS) identity and access management (IAM). Consequently this project was born. Given an already created EC2 instance and existing credentials, team members may now start and stop the game server. Stopping is fairly important since we are all not yet strong players and if the server continue to run unchecked, the zombies would continue to get stronger and more aggressive.
 
 ## Quick Start
 
