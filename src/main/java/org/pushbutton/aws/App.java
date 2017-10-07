@@ -77,20 +77,7 @@ public class App {
 		File configFile = new File(home, ".aws/credentials");
 		
 		try {
-			AWSCredentialsProvider provider = new ProfileCredentialsProvider(
-					new ProfilesConfigFile(configFile), "default");
-			AmazonEC2ClientBuilder builder = AmazonEC2ClientBuilder.standard()
-					.withCredentials(provider)
-					.withRegion(Regions.US_EAST_1);
-			AmazonEC2 ec2 = builder.build();
-			for (Instance i : getInstances(ec2)) {
-				if (i.getInstanceId().equals(instanceId)) {
-					launcherFrame.setAwsClient(ec2);
-					launcherFrame.setInstance(i);
-					launcherFrame.startListeners();
-					break;
-				}
-			}			
+			updateLauncher(configFile);
 		} catch (Exception ex) {
 			if (ex instanceof IllegalArgumentException) {
 				String profileNotFound = "AWS credential profiles file not " +
@@ -100,12 +87,35 @@ public class App {
 					login.setModal(true);
 					login.setVisible(true);
 					
+					// Let's try this again.
+					updateLauncher(configFile);
 				}
 			} else {
 				JOptionPane.showMessageDialog(this.launcherFrame, ex.getMessage(),
 						"Error", JOptionPane.WARNING_MESSAGE);
 			}
 		}
+	}
+
+	private void updateLauncher(File configFile) {
+		AmazonEC2 ec2 = getClient(configFile);
+		for (Instance i : getInstances(ec2)) {
+			if (i.getInstanceId().equals(instanceId)) {
+				launcherFrame.setAwsClient(ec2);
+				launcherFrame.setInstance(i);
+				launcherFrame.startListeners();
+				break;
+			}
+		}
+	}
+	
+	private AmazonEC2 getClient(File configFile) {
+		AWSCredentialsProvider provider = new ProfileCredentialsProvider(
+				new ProfilesConfigFile(configFile), "default");
+		AmazonEC2ClientBuilder builder = AmazonEC2ClientBuilder.standard()
+				.withCredentials(provider)
+				.withRegion(Regions.US_EAST_1);
+		return builder.build();
 	}
 	
 	private List<Instance> getInstances(AmazonEC2 ec2) {

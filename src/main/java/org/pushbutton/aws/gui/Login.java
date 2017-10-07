@@ -96,11 +96,11 @@ public class Login extends JDialog {
 					ini.add("default", "aws_secret_access_key", new String(
 							secret.getPassword()));
 					ini.store();
+					
 					Login.this.setVisible(false);
-					// TODO - I'm not sure raising this event is strictly necessary.
+					Login.this.setModal(false);					
 					Login.this.dispatchEvent(new WindowEvent(Login.this,
 							WindowEvent.WINDOW_CLOSING));
-					Login.this.setModal(false);
 				} catch (IOException ioe) {
 					// TODO Auto-generated catch block
 					ioe.printStackTrace();
