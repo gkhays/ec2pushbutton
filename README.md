@@ -2,11 +2,19 @@
 
 Simple one button touch to start and stop a given EC2 instance.
 
-## Motivation
+### Motivation
 
 This project started with a need to easily start and stop our [7 Days to Die game server](http://store.steampowered.com/app/251570/7_Days_to_Die/). Surprisingly, not everyone wanted to learn how to operate Amazon EC2 instances nor did they want to learn the nuances of Amazon Web Services (AWS) identity and access management (IAM). Consequently this project was born. Given an already created EC2 instance and existing credentials, team members may now start and stop the game server. Stopping is fairly important since we are all not yet strong players and if the server continue to run unchecked, the zombies would continue to get stronger and more aggressive.
 
-## Quick Start
+## Getting Started
+
+To build this project you will need the following:
+
+* JDK
+* Maven
+* AWS Account (free tier is ok)
+
+## Running
 
 ### Prerequisites
 
@@ -15,6 +23,8 @@ A Java runtime environment (JRE) is required. So first navigate to the Java down
 ![JRE Download](images/jre.png)
 
 [Java SE Runtime Environment 8 Downloads](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
+
+### Installing
 
 ### Windows
 
@@ -31,3 +41,7 @@ The app is now ready to start the EC2 instance.
 ### Mac and Linux
 
 Support for Mac and Linux is on the way...
+
+## Acknowledgements
+
+[README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2) from [@PurpleBooth](https://gist.github.com/PurpleBooth).
