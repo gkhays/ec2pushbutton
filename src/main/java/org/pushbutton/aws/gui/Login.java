@@ -100,6 +100,7 @@ public class Login extends JDialog {
 					// TODO - I'm not sure raising this event is strictly necessary.
 					Login.this.dispatchEvent(new WindowEvent(Login.this,
 							WindowEvent.WINDOW_CLOSING));
+					Login.this.setModal(false);
 				} catch (IOException ioe) {
 					// TODO Auto-generated catch block
 					ioe.printStackTrace();
@@ -112,6 +113,7 @@ public class Login extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Login.this.setVisible(false);
+				Login.this.setModal(false);
 			}
 			
 		});
