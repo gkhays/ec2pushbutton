@@ -80,8 +80,16 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
 							<finalName>${project.name}-${project.version}</finalName>
+<!-- 							<minimizeJar>true</minimizeJar> -->
+<!-- 							<filters> -->
+<!-- 								<filter> -->
+<!-- 									<artifact>com.amazonaws:aws-java-sdk-core</artifact> -->
+<!-- 									<includes> -->
+<!-- 										<include>org/apache/commons/logging/**</include> -->
+<!-- 									</includes> -->
+<!-- 								</filter> -->
+<!-- 							</filters> -->
 						</configuration>
 					</execution>
 				</executions>
