@@ -10,6 +10,7 @@
 	<properties>
 		<jdk.version>1.6</jdk.version>
 		<mainClass>org.pushbutton.aws.App</mainClass>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties><dependencies>
 		<dependency>
 			<groupId>org.ini4j</groupId>
@@ -79,6 +80,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<minimizeJar>true</minimizeJar>
 							<finalName>${project.name}-${project.version}</finalName>
 						</configuration>
 					</execution>
