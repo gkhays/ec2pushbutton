@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import org.ini4j.Wini;
 import org.pushbutton.aws.gui.AWSLauncher;
 import org.pushbutton.aws.gui.Login;
 
@@ -73,29 +74,39 @@ public class App {
 		initialize();
 	}
 
-	private void authenticate() {
+	private void authenticate() throws IOException {
 		String home = System.getProperty("user.home");
 		File configFile = new File(home, ".aws/credentials");
+		
+		if (!configFile.exists()) {
+			System.out.println(configFile.getName() + " does not exist.");
+			configFile.getParentFile().mkdirs();
+			configFile.createNewFile();
+			System.out.println("So I created it.");
+		}
 		
 		try {
 			updateLauncher(configFile);
 		} catch (Exception ex) {
+			String noProfile = "No AWS profile";
+			String fileNotFound = "AWS credential profiles file not found";
 			if (ex instanceof IllegalArgumentException) {
-				String profileNotFound = "AWS credential profiles file not " +
-						"found in the given path:";
-				if (ex.getMessage().startsWith(profileNotFound)) {
-					Login login = new Login(launcherFrame, configFile);
-					login.setModal(true);
-					login.setVisible(true);
-					
-					// Let's try this again.
-					updateLauncher(configFile);
+				if (ex.getMessage().startsWith(noProfile)
+						|| ex.getMessage().startsWith(fileNotFound)) {
+					doLogin(configFile);
 				}
-			} else {
+			} else {			
 				JOptionPane.showMessageDialog(this.launcherFrame, ex.getMessage(),
-						"Error", JOptionPane.WARNING_MESSAGE);
+						"Login Error", JOptionPane.WARNING_MESSAGE);
 			}
 		}
+	}
+
+	private void doLogin(File configFile) {
+		Login login = new Login(launcherFrame, configFile);
+		login.setModal(true);
+		login.setVisible(true);
+		updateLauncher(configFile);
 	}
 
 	private void updateLauncher(File configFile) {

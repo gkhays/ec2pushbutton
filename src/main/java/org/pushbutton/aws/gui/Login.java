@@ -90,15 +90,27 @@ public class Login extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					configFile.createNewFile();
-					Wini ini = new Wini(configFile);
-					ini.add("default", "aws_access_key_id", key.getText());
-					ini.add("default", "aws_secret_access_key", new String(
-							secret.getPassword()));
-					ini.store();
-					
+					System.out.println("Credential cache: "
+							+ configFile.getAbsolutePath());
+					if (configFile.exists()) {
+						Wini ini = new Wini(configFile);
+						ini.add("default", "aws_access_key_id", key.getText());
+						ini.add("default", "aws_secret_access_key", new String(
+								secret.getPassword()));
+						ini.store();
+					} else {
+						System.out.println(configFile.getName()
+								+ " does not exist");
+						if (!configFile.getParentFile().exists()) {
+							System.out.println(configFile.getName()
+									+ "'s parent does not exist");
+							configFile.getParentFile().mkdirs();
+						}
+						configFile.createNewFile();
+					}
+
 					Login.this.setVisible(false);
-					Login.this.setModal(false);					
+					Login.this.setModal(false);
 					Login.this.dispatchEvent(new WindowEvent(Login.this,
 							WindowEvent.WINDOW_CLOSING));
 					dispose();
