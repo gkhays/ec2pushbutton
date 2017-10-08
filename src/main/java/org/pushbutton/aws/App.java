@@ -154,7 +154,8 @@ public class App {
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this.launcherFrame, e.getMessage(),
 					"Error", JOptionPane.WARNING_MESSAGE);
-			// TODO - Hard code the instance ID until we have a work-around.
+			// TODO - Hard code the instance ID until we have a good way to set
+			// the default.
 			instanceId = "i-01e6e1abc0e3edc54";
 		}
 		

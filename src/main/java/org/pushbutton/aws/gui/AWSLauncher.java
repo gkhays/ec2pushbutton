@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JButton;
 
+import org.pushbutton.aws.App;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
 
@@ -21,8 +22,12 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
@@ -108,10 +113,7 @@ public class AWSLauncher extends JFrame {
 				result.getStartingInstances();
 				
 				// Poll for status change and update our indicators.
-				checkStatus();
-				footerPanel.updateStatus(getInstanceStatus());
-				footerPanel.setIPAddress(awsInstance.getPublicIpAddress());
-				setCursor(Cursor.getDefaultCursor());
+				checkStatus();				
 				btnStop.setEnabled(true);
 			}
 
@@ -127,8 +129,7 @@ public class AWSLauncher extends JFrame {
 				StopInstancesResult result = ec2.stopInstances(request);
 				result.getStoppingInstances();
 				
-				checkStatus();
-				footerPanel.updateStatus(getInstanceStatus());
+				// TODO - Should we check to make sure it's stopping?
 				
 				awsInstanceUp = false;
 				footerPanel.updateStatus(getInstanceStatus());
@@ -150,20 +151,9 @@ public class AWSLauncher extends JFrame {
 	private void checkStatus() {
 		// In progress states are pending, shutting-down, and stopping. Whereas
 		// complete states are running, terminated, and stopped.
-		org.pushbutton.aws.App.TASKPOOL.execute(new Runnable() {
+		App.TASKPOOL.execute(new Runnable() {
 			public void run() {
-				while (awsInstance.getState().getName().equals("pending")) {
-					awsInstanceUp = false;
-					footerPanel.updateStatus(getInstanceStatus());
-					System.out.println("Pending...");
-				}
-				
-				if (awsInstance.getState().getName().equals("running")) {
-					awsInstanceUp = true;
-					footerPanel.updateStatus(getInstanceStatus());
-					footerPanel.setIPAddress(awsInstance.getPublicIpAddress());
-					System.out.println("IP Address: " + awsInstance.getPublicIpAddress());
-				}
+				loopUntilStateChanges();
 			}
 		});
 	}
@@ -176,6 +166,33 @@ public class AWSLauncher extends JFrame {
         } else {
             return Status.PARTIAL;
         }
+	}
+	
+	private void loopUntilStateChanges() {
+		boolean success = false;
+		String ipAddress = null;
+		String targetState = "running";
+		String targetInstance = awsInstance.getInstanceId();
+		while (!success) {
+			DescribeInstancesRequest request = new DescribeInstancesRequest();
+			DescribeInstancesResult response = ec2.describeInstances(request);
+			
+			for (Reservation reservation : response.getReservations()) {
+				for (Instance instance : reservation.getInstances()) {
+					if (instance.getInstanceId().equals(targetInstance)) {
+						if (instance.getState().getName().equals(targetState)) {
+							ipAddress = instance.getPublicIpAddress();
+							success = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		awsInstanceUp = true;
+		footerPanel.updateStatus(getInstanceStatus());
+		footerPanel.setIPAddress(ipAddress);
+		setCursor(Cursor.getDefaultCursor());
 	}
 
 }
