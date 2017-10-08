@@ -101,6 +101,7 @@ public class Login extends JDialog {
 					Login.this.setModal(false);					
 					Login.this.dispatchEvent(new WindowEvent(Login.this,
 							WindowEvent.WINDOW_CLOSING));
+					dispose();
 				} catch (IOException ioe) {
 					// TODO Auto-generated catch block
 					ioe.printStackTrace();
@@ -114,10 +115,12 @@ public class Login extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				Login.this.setVisible(false);
 				Login.this.setModal(false);
+				dispose();
 			}
 			
 		});
 		
-		setResizable(false);
+		this.setResizable(false);
+		this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 	}
 }
