@@ -36,6 +36,10 @@ The first time the application is run, it will prompt for credentials. Currently
 
 ![Login](images/login.png)
 
+The Amazon AWS credential store will detect that a new key and secret has been added and ask you to confirm. Click on yes.
+
+![Credentials Changed](images/cred-changed.png)
+
 The app is now ready to start the EC2 instance.
 
 ![App Start](images/app-start.png)
