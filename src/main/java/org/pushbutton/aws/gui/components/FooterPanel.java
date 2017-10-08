@@ -5,15 +5,11 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JToolTip;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.pushbutton.utils.Utils;
 
 import java.awt.Color;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -73,7 +69,6 @@ public class FooterPanel extends JPanel {
 		
 		btnCopy.addActionListener(new ActionListener() {
 
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				StringSelection selection = new StringSelection(ipAddress.getText());
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

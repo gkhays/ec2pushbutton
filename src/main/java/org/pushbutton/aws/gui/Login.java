@@ -99,13 +99,7 @@ public class Login extends JDialog {
 								secret.getPassword()));
 						ini.store();
 					} else {
-						System.out.println(configFile.getName()
-								+ " does not exist");
-						if (!configFile.getParentFile().exists()) {
-							System.out.println(configFile.getName()
-									+ "'s parent does not exist");
-							configFile.getParentFile().mkdirs();
-						}
+						configFile.getParentFile().mkdirs();
 						configFile.createNewFile();
 					}
 
@@ -123,7 +117,6 @@ public class Login extends JDialog {
 		
 		cancelButton.addActionListener(new ActionListener() {
 
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				Login.this.setVisible(false);
 				Login.this.setModal(false);
