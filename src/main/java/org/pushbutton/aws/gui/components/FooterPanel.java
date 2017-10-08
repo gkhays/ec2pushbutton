@@ -3,7 +3,9 @@ package org.pushbutton.aws.gui.components;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.JToolTip;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.pushbutton.utils.Utils;
@@ -12,6 +14,14 @@ import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
 
 public class FooterPanel extends JPanel {
 
@@ -25,16 +35,12 @@ public class FooterPanel extends JPanel {
 	}
 	
 	private JLabel statusLED;
-	private JLabel ipAddress;
+	private JTextField ipAddress;
+	private JButton btnCopy;
 
 	public FooterPanel() {
 		setToolTipText("Server IP Address");
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0};
-		gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0};
-		gridBagLayout.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		setLayout(gridBagLayout);
+		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		statusLED = new JLabel(
 				org.pushbutton.utils.Utils
@@ -51,24 +57,30 @@ public class FooterPanel extends JPanel {
 		};
 		statusLED.setBorder(BorderFactory.createEmptyBorder());
 		statusLED.setToolTipText("Check AWS Instance Status");
-		
-		GridBagConstraints gbc_lblStatusLED = new GridBagConstraints();
-		gbc_lblStatusLED.insets = new Insets(0, 0, 0, 5);
-		gbc_lblStatusLED.gridx = 0;
-		gbc_lblStatusLED.gridy = 0;
-		add(statusLED, gbc_lblStatusLED);
+		add(statusLED);
 		
 		JLabel lblInstanceStatus = new JLabel("AWS Instance Status");
-		GridBagConstraints gbc_lblInstanceStatus = new GridBagConstraints();
-		gbc_lblInstanceStatus.gridx = 1;
-		gbc_lblInstanceStatus.gridy = 0;
-		add(lblInstanceStatus, gbc_lblInstanceStatus);
+		add(lblInstanceStatus);		
 		
-		ipAddress = new JLabel("localhost");
-		GridBagConstraints gbcIPAddress = new GridBagConstraints();
-		gbcIPAddress.gridx = 2;
-		gbcIPAddress.gridy = 0;
-		add(ipAddress, gbcIPAddress);
+		ipAddress = new JTextField("255.255.255.255");
+		ipAddress.setToolTipText("Server IP address");
+		ipAddress.setEditable(false);
+		add(ipAddress);
+		
+		btnCopy = new JButton("Copy");
+		btnCopy.setToolTipText("Copy to clipboard");
+		add(btnCopy);
+		
+		btnCopy.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StringSelection selection = new StringSelection(ipAddress.getText());
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(selection, null);
+			}
+			
+		});
 	}
 	
 	public void updateStatus(Status status) {        

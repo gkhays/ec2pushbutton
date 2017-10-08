@@ -58,6 +58,7 @@ public class App {
 					App window = new App();
 					window.authenticate();
 					window.launcherFrame.setVisible(true);
+					window.launcherFrame.setResizable(false);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
