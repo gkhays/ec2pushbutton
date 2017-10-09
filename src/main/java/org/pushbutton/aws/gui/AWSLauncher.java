@@ -22,6 +22,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
@@ -32,6 +33,15 @@ import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesResult;
+
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
+import javax.swing.KeyStroke;
+
+import java.awt.event.InputEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AWSLauncher extends JFrame {
 
@@ -48,6 +58,10 @@ public class AWSLauncher extends JFrame {
 	private boolean awsInstanceUp = false;
 	private AmazonEC2 ec2;
 	private Instance awsInstance;
+	private JMenuBar menuBar;
+	private JMenu mnOptions;
+	private JMenuItem mntmSettings;
+	private JMenuItem mntmEcInstances;
 
 	/**
 	 * Create the frame.
@@ -55,6 +69,21 @@ public class AWSLauncher extends JFrame {
 	public AWSLauncher() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
+		
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		mnOptions = new JMenu("Options");
+		mnOptions.setMnemonic(KeyEvent.VK_O);
+		menuBar.add(mnOptions);
+		
+		mntmSettings = new JMenuItem("Settings");
+		mntmSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mnOptions.add(mntmSettings);
+		
+		mntmEcInstances = new JMenuItem("EC2 Instances");
+		mntmEcInstances.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+		mnOptions.add(mntmEcInstances);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -95,14 +124,13 @@ public class AWSLauncher extends JFrame {
 		
 		footerPanel = new FooterPanel();
 		footerPanel.updateStatus(getInstanceStatus());
-		this.add(footerPanel, BorderLayout.SOUTH);
+		getContentPane().add(footerPanel, BorderLayout.SOUTH);
 	}
 	
 	public void startListeners() {
 		final String instanceId = awsInstance.getInstanceId();
 
 		btnStart.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				btnStart.setEnabled(false);
@@ -116,11 +144,9 @@ public class AWSLauncher extends JFrame {
 				checkStatus();				
 				btnStop.setEnabled(true);
 			}
-
 		});
 		
 		btnStop.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				btnStop.setEnabled(false);
 				
@@ -135,9 +161,45 @@ public class AWSLauncher extends JFrame {
 				footerPanel.updateStatus(getInstanceStatus());
 				btnStart.setEnabled(true);
 			}
-
 		});
 		
+		mntmSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SettingsGui settings = new SettingsGui();
+				settings.setVisible(true);
+			}			
+		});
+		
+		mntmEcInstances.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				InstancesGui instances = new InstancesGui(getInstances(ec2));
+				instances.setVisible(true);
+			}
+		});
+		
+	}
+	
+	// TODO - This is the second instance of this method. Probably need to refactor into a utility class.
+	private List<Instance> getInstances(AmazonEC2 ec2) {
+		boolean done = false;
+		List<Instance> instanceList = new ArrayList<Instance>();
+		while (!done) {
+			DescribeInstancesRequest request = new DescribeInstancesRequest();
+			DescribeInstancesResult response = ec2.describeInstances(request);
+			
+			for (Reservation reservation : response.getReservations()) {
+				for (Instance instance : reservation.getInstances()) {
+					instanceList.add(instance);
+				}
+			}
+
+			request.setNextToken(response.getNextToken());
+
+			if (response.getNextToken() == null) {
+				done = true;
+			}
+		}
+		return instanceList;
 	}
 
 	public void setAwsClient(AmazonEC2 ec2) {
