@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
-import org.ini4j.Wini;
 import org.pushbutton.aws.gui.AWSLauncher;
 import org.pushbutton.aws.gui.Login;
 
@@ -37,6 +36,8 @@ public class App {
 	 * Background task runner.
 	 */
 	public static final ExecutorService TASKPOOL = Executors.newFixedThreadPool(2);
+	
+	public static Properties properties;
 	
 	private AWSLauncher launcherFrame;
 	private String instanceId;
@@ -72,6 +73,10 @@ public class App {
 	 */
 	public App() {
 		initialize();
+	}
+	
+	public Properties getProperties() {
+		return properties;
 	}
 
 	private void authenticate() throws IOException {
@@ -158,7 +163,7 @@ public class App {
 	private void initialize() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream in = classLoader.getResourceAsStream("app.properties");
-		Properties properties = new Properties();
+		properties = new Properties();
 		
 		try {
 			properties.load(in);
