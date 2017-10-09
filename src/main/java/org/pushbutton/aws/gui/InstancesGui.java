@@ -10,14 +10,14 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Instances extends Configuration {
+public class InstancesGui extends ConfigurationFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8709584604938742735L;
 	
-	public Instances(List<Instance> list) {
+	public InstancesGui(List<Instance> list) {
 		setBounds(new Rectangle(100, 100, 600, 300));
 		setTitle("EC2 Instances");
 		DefaultTableModel model = new DefaultTableModel();
@@ -45,7 +45,7 @@ public class Instances extends Configuration {
 		
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Instances.this.setVisible(false);
+				InstancesGui.this.setVisible(false);
 			}
 		});
 	}

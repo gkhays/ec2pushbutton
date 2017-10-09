@@ -4,10 +4,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,7 +15,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import org.pushbutton.aws.gui.AWSLauncher;
-import org.pushbutton.aws.gui.Login;
+import org.pushbutton.aws.gui.LoginForm;
+import org.pushbutton.utils.SettingsManager;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -36,8 +35,6 @@ public class App {
 	 * Background task runner.
 	 */
 	public static final ExecutorService TASKPOOL = Executors.newFixedThreadPool(2);
-	
-	public static Properties properties;
 	
 	private AWSLauncher launcherFrame;
 	private String instanceId;
@@ -74,10 +71,6 @@ public class App {
 	public App() {
 		initialize();
 	}
-	
-	public Properties getProperties() {
-		return properties;
-	}
 
 	private void authenticate() throws IOException {
 		String home = System.getProperty("user.home");
@@ -108,7 +101,7 @@ public class App {
 	}
 
 	private void doLogin(File configFile) {
-		Login login = new Login(launcherFrame, configFile);
+		LoginForm login = new LoginForm(launcherFrame, configFile);
 		login.setModal(true);
 		login.setVisible(true);
 		updateLauncher(configFile);
@@ -160,21 +153,8 @@ public class App {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream in = classLoader.getResourceAsStream("app.properties");
-		properties = new Properties();
-		
-		try {
-			properties.load(in);
-			instanceId = properties.getProperty("instanceId");
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this.launcherFrame, e.getMessage(),
-					"Error", JOptionPane.WARNING_MESSAGE);
-			// TODO - Hard code the instance ID until we have a good way to set
-			// the default.
-			instanceId = "i-01e6e1abc0e3edc54";
-		}
+	private void initialize() {		
+		instanceId = SettingsManager.getProperties().getProperty("instanceId");
 		
 		launcherFrame = new AWSLauncher();
 		launcherFrame.setBounds(100, 100, 450, 300);

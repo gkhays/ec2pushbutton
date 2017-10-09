@@ -165,14 +165,14 @@ public class AWSLauncher extends JFrame {
 		
 		mntmSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings settings = new Settings(App.properties);
+				SettingsGui settings = new SettingsGui();
 				settings.setVisible(true);
 			}			
 		});
 		
 		mntmEcInstances.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Instances instances = new Instances(getInstances(ec2));
+				InstancesGui instances = new InstancesGui(getInstances(ec2));
 				instances.setVisible(true);
 			}
 		});

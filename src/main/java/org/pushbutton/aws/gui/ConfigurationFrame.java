@@ -23,10 +23,12 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
-public class Configuration extends JFrame {
+public class ConfigurationFrame extends JFrame {
 
 	protected JTable table;
+	protected JPanel panel;
 	protected JButton btnOk;
+	protected JButton btnCancel;
 	
 	/**
 	 * 
@@ -37,7 +39,7 @@ public class Configuration extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Configuration() {
+	public ConfigurationFrame() {
 		setResizable(false);		
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -49,10 +51,16 @@ public class Configuration extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		table = new JTable();
-		scrollPane.setViewportView(table);		
+		scrollPane.setViewportView(table);
+		
+		panel = new JPanel();
+		contentPane.add(panel, BorderLayout.SOUTH);
 		
 		btnOk = new JButton("OK");
-		contentPane.add(btnOk, BorderLayout.SOUTH);
+		panel.add(btnOk);
+		
+		btnCancel = new JButton("Cancel");
+		panel.add(btnCancel);
 	}
 
 }

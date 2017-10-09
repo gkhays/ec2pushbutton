@@ -22,7 +22,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
-public class Login extends JDialog {
+public class LoginForm extends JDialog {
 
 	/**
 	 * 
@@ -39,7 +39,7 @@ public class Login extends JDialog {
 	 * @param launcherFrame 
 	 * @param configFile 
 	 */
-	public Login(JFrame launcherFrame, final File configFile) {
+	public LoginForm(JFrame launcherFrame, final File configFile) {
 		this.configFile = configFile;
 		
 		setBounds(100, 100, 420, 170);
@@ -103,9 +103,9 @@ public class Login extends JDialog {
 						configFile.createNewFile();
 					}
 
-					Login.this.setVisible(false);
-					Login.this.setModal(false);
-					Login.this.dispatchEvent(new WindowEvent(Login.this,
+					LoginForm.this.setVisible(false);
+					LoginForm.this.setModal(false);
+					LoginForm.this.dispatchEvent(new WindowEvent(LoginForm.this,
 							WindowEvent.WINDOW_CLOSING));
 					dispose();
 				} catch (IOException ioe) {
@@ -118,8 +118,8 @@ public class Login extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				Login.this.setVisible(false);
-				Login.this.setModal(false);
+				LoginForm.this.setVisible(false);
+				LoginForm.this.setModal(false);
 				dispose();
 			}
 			
