@@ -18,9 +18,11 @@ To build this project you will need the following:
 
 ## Running
 
-You may view or change the target server instance. This is accessible via the new options menu.
+For a historical reason, the EC2 instance ID is set to a default value. You may now view or change the target server instance. This is accessible via the new options menu.
 
 ![Settings Menu](images/settings-menu.png)
+
+Clicking on the menu item brings up a properties form containing the instance ID.
 
 ![Settings Form](images/settings-form.png)
 
