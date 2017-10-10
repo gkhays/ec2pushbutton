@@ -18,6 +18,16 @@ To build this project you will need the following:
 
 ## Running
 
+You may view or change the target server instance. This is accessible via the new options menu.
+
+![Settings Menu](images/settings-menu.png)
+
+![Settings Form](images/settings-form.png)
+
+Available `EC2` instances may be viewed from the EC2 instances menu item.
+
+![Instances Form](images/instances-form.png)
+
 ### Prerequisites
 
 A Java runtime environment (JRE) is required. So first navigate to the Java download page and get the latest version for your PC. Note: you must first accept the license agreement. In most cases, choose the 64-bit version.
