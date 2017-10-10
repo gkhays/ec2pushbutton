@@ -11,6 +11,7 @@ import org.pushbutton.utils.Utils;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -42,7 +43,6 @@ public class FooterPanel extends JPanel {
 				org.pushbutton.utils.Utils
 						.getIconImage("/assets/image/StatusWhite.png")) {
 			private static final long serialVersionUID = 1L;
-
 			public JToolTip createToolTip() {
 				JToolTip tip = super.createToolTip();
 				Border border = new CustomLineBorder(5,
@@ -68,13 +68,11 @@ public class FooterPanel extends JPanel {
 		add(btnCopy);
 		
 		btnCopy.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				StringSelection selection = new StringSelection(ipAddress.getText());
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(selection, null);
-			}
-			
+			}			
 		});
 	}
 	
@@ -87,10 +85,13 @@ public class FooterPanel extends JPanel {
             case ONLINE:
             	statusLED.setToolTipText("AWS instance is online!");
             	statusLED.setIcon(Utils.getIconImage("/assets/image/StatusGreen.png"));
+            	ipAddress.setEnabled(true);
                 break;
             case OFFLINE:
             	statusLED.setToolTipText("AWS instance is offline");
             	statusLED.setIcon(Utils.getIconImage("/assets/image/StatusRed.png"));
+            	ipAddress.setEnabled(false);
+            	// TODO - Is there any point in leaving the copy button enabled?
                 break;
             case PARTIAL:
             	statusLED.setToolTipText("AWS instance partial availability");

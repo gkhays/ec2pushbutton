@@ -1,4 +1,4 @@
-package org.pushbutton.aws.gui;
+package org.pushbutton.aws.gui.components;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
