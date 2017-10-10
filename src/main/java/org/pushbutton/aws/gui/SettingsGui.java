@@ -16,6 +16,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.pushbutton.aws.gui.components.ConfigurationFrame;
 import org.pushbutton.utils.SettingsManager;
 
 public class SettingsGui extends ConfigurationFrame {

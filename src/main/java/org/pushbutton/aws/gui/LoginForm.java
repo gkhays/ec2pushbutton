@@ -32,6 +32,8 @@ public class LoginForm extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField key;
 	private JPasswordField secret;
+	
+	@SuppressWarnings("unused")
 	private File configFile;
 
 	/**

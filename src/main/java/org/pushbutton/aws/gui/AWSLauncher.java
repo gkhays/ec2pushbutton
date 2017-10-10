@@ -26,12 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
-import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceStatus;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
@@ -48,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AWSLauncher extends JFrame {
-
+	
 	/**
 	 * 
 	 */
@@ -57,15 +54,16 @@ public class AWSLauncher extends JFrame {
 	private JPanel contentPane;
 	private JButton btnStart;
 	private JButton btnStop;
+	private JMenuBar menuBar;
+	private JMenu mnOptions;
+	private JMenuItem mntmSettings;
+	private JMenuItem mntmEcInstances;
 	private FooterPanel footerPanel;
 	
 	private boolean awsInstanceUp = false;
 	private AmazonEC2 ec2;
 	private String instanceId;
-	private JMenuBar menuBar;
-	private JMenu mnOptions;
-	private JMenuItem mntmSettings;
-	private JMenuItem mntmEcInstances;
+	private String ipAddress;
 
 	/**
 	 * Create the frame.
@@ -179,7 +177,11 @@ public class AWSLauncher extends JFrame {
 				result.getStartingInstances();
 				
 				// Poll for status change and update our indicators.
-				checkStatus();				
+				checkStatus("running");
+				
+				awsInstanceUp = true;
+				footerPanel.setIPAddress("pending...");
+				footerPanel.updateStatus(getInstanceStatus());		
 				btnStop.setEnabled(true);
 			}
 		});
@@ -194,6 +196,7 @@ public class AWSLauncher extends JFrame {
 				result.getStoppingInstances();
 				
 				// TODO - Should we check to make sure it's stopping?
+				checkStatus("stopping");
 				
 				awsInstanceUp = false;
 				footerPanel.updateStatus(getInstanceStatus());
@@ -251,14 +254,18 @@ public class AWSLauncher extends JFrame {
 		this.instanceId = instanceId;
 	}
 
-	private void checkStatus() {
+	private void checkStatus(String state) {
 		// In progress states are: pending, shutting-down, and stopping. Whereas
 		// complete states are running, terminated, and stopped.
+		final String myState = state;
 		App.TASKPOOL.execute(new Runnable() {
 			public void run() {
-				loopUntilStateChanges();
+				loopUntilStateChanges(myState);
 			}
 		});
+
+		awsInstanceUp = true;
+		footerPanel.updateStatus(getInstanceStatus());
 	}
 
 	private Status getInstanceStatus() {
@@ -271,10 +278,8 @@ public class AWSLauncher extends JFrame {
         }
 	}
 	
-	private void loopUntilStateChanges() {
+	private void loopUntilStateChanges(String targetState) {
 		boolean success = false;
-		String ipAddress = null;
-		String targetState = "running";
 		while (!success) {
 			DescribeInstancesRequest request = new DescribeInstancesRequest();
 			DescribeInstancesResult response = ec2.describeInstances(request);
@@ -291,8 +296,9 @@ public class AWSLauncher extends JFrame {
 				}
 			}
 		}
-		awsInstanceUp = true;
-		footerPanel.updateStatus(getInstanceStatus());
+
+		// TODO - Maybe a Future<T> or Callable<T> so we don't have to depend on
+		// side effects.
 		footerPanel.setIPAddress(ipAddress);
 		setCursor(Cursor.getDefaultCursor());
 	}

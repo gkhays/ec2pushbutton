@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
+import org.pushbutton.aws.gui.components.ConfigurationFrame;
+
 import com.amazonaws.services.ec2.model.Instance;
 
 import java.awt.Rectangle;
