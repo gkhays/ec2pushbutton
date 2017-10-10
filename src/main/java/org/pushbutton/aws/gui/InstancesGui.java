@@ -48,6 +48,10 @@ public class InstancesGui extends ConfigurationFrame {
 				InstancesGui.this.setVisible(false);
 			}
 		});
+		
+		// We don't need the cancel button.
+		this.btnCancel.setEnabled(false);
+		this.btnCancel.setVisible(false);
 	}
 
 }

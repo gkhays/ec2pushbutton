@@ -77,10 +77,8 @@ public class App {
 		File configFile = new File(home, ".aws/credentials");
 		
 		if (!configFile.exists()) {
-			System.out.println(configFile.getName() + " does not exist.");
 			configFile.getParentFile().mkdirs();
 			configFile.createNewFile();
-			System.out.println("So I created it.");
 		}
 		
 		try {
@@ -109,11 +107,15 @@ public class App {
 
 	private void updateLauncher(File configFile) {
 		AmazonEC2 ec2 = getClient(configFile);
+		// TODO - So now that I know I can get these one at a time, there is no
+		// need to loop through all instances. Also, all the mutators on
+		// AWSLauncher are ridiculous!
 		for (Instance i : getInstances(ec2)) {
 			if (i.getInstanceId().equals(instanceId)) {
 				launcherFrame.setAwsClient(ec2);
-				launcherFrame.setInstance(i);
+				launcherFrame.setInstance(i.getInstanceId());
 				launcherFrame.startListeners();
+				launcherFrame.checkInstanceAlreadyRunning(i.getInstanceId());
 				break;
 			}
 		}

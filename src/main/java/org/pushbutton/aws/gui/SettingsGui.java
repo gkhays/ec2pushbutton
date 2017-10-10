@@ -30,6 +30,7 @@ public class SettingsGui extends ConfigurationFrame {
 	private Map<String, String> changedEntries;
 
 	public SettingsGui() {
+		btnOk.setToolTipText("Save property changes");
 		this.properties = SettingsManager.getProperties();
 		changedEntries = new HashMap<String, String>();
 		setTitle("Configuration Settings");
@@ -62,7 +63,7 @@ public class SettingsGui extends ConfigurationFrame {
 		btnOk.setText("Save");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveTable();
+				saveTable();				
 				SettingsGui.this.setVisible(false);
 			}
 		});
