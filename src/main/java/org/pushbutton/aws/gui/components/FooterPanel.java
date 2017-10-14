@@ -39,8 +39,7 @@ public class FooterPanel extends JPanel {
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		statusLED = new JLabel(
-				org.pushbutton.utils.Utils
-						.getIconImage("/assets/image/StatusWhite.png")) {
+				Utils.getIconImage("/assets/image/StatusWhite.png")) {
 			private static final long serialVersionUID = 1L;
 			public JToolTip createToolTip() {
 				JToolTip tip = super.createToolTip();
