@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 
 import org.pushbutton.aws.App;
+import org.pushbutton.aws.gui.components.ColorMenuBar;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
 import org.pushbutton.utils.SettingsManager;
@@ -21,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -39,22 +41,23 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AWSLauncher extends JFrame {
+public class AWSLauncher extends JFrame {	
 	
-	/**
-	 * 
-	 */
+	public static final Color TXT_COLOR = Color.WHITE;
+	
 	private static final long serialVersionUID = -5754438927656452678L;
+	private static final Color BG_COLOR = Color.DARK_GRAY;
 	
 	private JPanel contentPane;
 	private JButton btnStart;
 	private JButton btnStop;
-	private JMenuBar menuBar;
+	private ColorMenuBar menuBar;
 	private JMenu mnOptions;
 	private JMenuItem mntmSettings;
 	private JMenuItem mntmEcInstances;
@@ -81,6 +84,7 @@ public class AWSLauncher extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.setBackground(BG_COLOR);
 		
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
@@ -90,6 +94,7 @@ public class AWSLauncher extends JFrame {
 		gbl_panel.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
+		panel.setBackground(BG_COLOR);
 		
 		btnStart = new JButton("Start");
 		btnStart.setToolTipText("Start AWS Instance");
@@ -108,7 +113,7 @@ public class AWSLauncher extends JFrame {
 		btnStop.setPreferredSize(new Dimension(200, 200));
 		btnStop.setFont(new Font("Arial", Font.BOLD, 40));
 		btnStop.setBackground(Color.RED);
-		btnStop.setForeground(Color.WHITE);
+		btnStop.setForeground(TXT_COLOR);
 		GridBagConstraints gbc_btnStop = new GridBagConstraints();
 		gbc_btnStop.gridx = 1;
 		gbc_btnStop.gridy = 0;
@@ -117,15 +122,18 @@ public class AWSLauncher extends JFrame {
 		
 		footerPanel = new FooterPanel();
 		footerPanel.updateStatus(getInstanceStatus());
+		footerPanel.setBackground(BG_COLOR);
 		getContentPane().add(footerPanel, BorderLayout.SOUTH);
 	}
 
 	private void createMenuBar() {
-		menuBar = new JMenuBar();
+		menuBar = new ColorMenuBar();
+		menuBar.setColor(BG_COLOR);
 		setJMenuBar(menuBar);
 		
 		mnOptions = new JMenu("Options");
 		mnOptions.setMnemonic(KeyEvent.VK_O);
+		mnOptions.setForeground(TXT_COLOR);
 		menuBar.add(mnOptions);
 		
 		mntmSettings = new JMenuItem("Settings");
