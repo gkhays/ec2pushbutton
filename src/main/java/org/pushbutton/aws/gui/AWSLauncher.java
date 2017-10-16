@@ -41,6 +41,7 @@ import com.amazonaws.services.ec2.model.StopInstancesResult;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -52,6 +53,7 @@ import java.util.Map;
 public class AWSLauncher extends JFrame {	
 	
 	public static final Color TXT_COLOR = Color.WHITE;
+	public static final String APP_NAME = "EC2 Push Button";
 	
 	private static final long serialVersionUID = -5754438927656452678L;
 	private static final Color BG_COLOR = Color.DARK_GRAY;
@@ -78,15 +80,25 @@ public class AWSLauncher extends JFrame {
 		this.instanceId = id;		
 		connector = new AWSConnector();
 		
-		setTitle("EC2 Push Button");
+		setTitle(APP_NAME + " (" + instanceId + ")");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);		
 		
 		createMenuBar();		
-		createContentPane();		
-
+		createContentPane();
 		startListeners();
-		checkInstanceAlreadyRunning();
+		
+		try {
+			checkInstanceAlreadyRunning();
+		} catch (Exception e) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("<html><body><p style='width: 300px;'>");
+			builder.append("The instance ID is not correct. " + e.getMessage());
+			builder.append("</p></body></html>");
+			String message = builder.toString();
+			JOptionPane.showMessageDialog(this, message, "Instance Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 		
 		App.splash.close();
 	}
@@ -159,7 +171,7 @@ public class AWSLauncher extends JFrame {
 		mnOptions.add(mntmEcInstances);
 	}
 
-	public void checkInstanceAlreadyRunning() {
+	public void checkInstanceAlreadyRunning() throws Exception {
 		Map<String, String> instance = connector.getInstance(instanceId);
 		
 		String state = instance.get("state");
@@ -213,8 +225,7 @@ public class AWSLauncher extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				SettingsGui settings = new SettingsGui();
 				settings.setVisible(true);
-				// TODO - If we have updated the settings, maybe reload them here?
-			}			
+			}
 		});
 		
 		mntmEcInstances.addActionListener(new ActionListener() {
@@ -256,11 +267,16 @@ public class AWSLauncher extends JFrame {
 	private void loopUntilStateChanges(String targetState) {
 		boolean success = false;
 		while (!success) {
-			if (connector.getInstance(instanceId).get("state")
-					.equals(targetState)) {
-				ipAddress = connector.getInstance(instanceId).get("ipAddress");
-				success = true;
-				break;
+			try {
+				if (connector.getInstance(instanceId).get("state")
+						.equals(targetState)) {
+					ipAddress = connector.getInstance(instanceId).get(
+							"ipAddress");
+					success = true;
+					break;
+				}
+			} catch (Exception e) {
+				return;
 			}
 		}
 
