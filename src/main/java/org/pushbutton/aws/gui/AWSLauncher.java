@@ -78,6 +78,7 @@ public class AWSLauncher extends JFrame {
 		this.instanceId = id;		
 		connector = new AWSConnector();
 		
+		setTitle("EC2 Push Button");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);		
 		
@@ -86,6 +87,8 @@ public class AWSLauncher extends JFrame {
 
 		startListeners();
 		checkInstanceAlreadyRunning();
+		
+		App.splash.close();
 	}
 
 	private void createContentPane() {
@@ -210,6 +213,7 @@ public class AWSLauncher extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				SettingsGui settings = new SettingsGui();
 				settings.setVisible(true);
+				// TODO - If we have updated the settings, maybe reload them here?
 			}			
 		});
 		
