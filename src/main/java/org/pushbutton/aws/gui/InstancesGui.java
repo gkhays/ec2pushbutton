@@ -12,8 +12,6 @@ import javax.swing.table.TableColumnModel;
 import org.pushbutton.aws.gui.components.ConfigurationFrame;
 import org.pushbutton.utils.Utils;
 
-import com.amazonaws.services.ec2.model.Instance;
-
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;

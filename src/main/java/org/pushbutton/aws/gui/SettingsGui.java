@@ -20,10 +20,7 @@ import org.pushbutton.aws.gui.components.ConfigurationFrame;
 import org.pushbutton.utils.SettingsManager;
 
 public class SettingsGui extends ConfigurationFrame {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 670290632895590534L;
 	
 	private DefaultTableModel model;

@@ -72,7 +72,7 @@ public class App {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {		
-		instanceId = SettingsManager.getProperties().getProperty("instanceId");		
+		instanceId = SettingsManager.getProperties().getProperty("instanceId");
 		launcherFrame = new AWSLauncher(instanceId);
 		launcherFrame.setBounds(100, 100, 450, 300);
 		launcherFrame.setLocationRelativeTo(null);
