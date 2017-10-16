@@ -2,6 +2,7 @@ package org.pushbutton.aws.gui;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -25,10 +26,16 @@ public class InstancesGui extends ConfigurationFrame {
 	 */
 	private static final long serialVersionUID = 8709584604938742735L;
 
+	// TODO - I intend for the order to be:
+	// ID, AMI, Type, State, Monitoring, DNS Name, IP Address
+	// But instead I am getting:
+	// ID, AMI, Type, IP Address, DNS Name, State, Monitoring
+//	private static final List<String> headers = Arrays.asList("ID", "AMI",
+//			"Type", "State", "Monitoring", "DNS Name", "IP Address");
 	private static final List<String> headers = Arrays.asList("ID", "AMI",
-			"Type", "State", "Monitoring", "DNS Name", "IP Address");
+			"Type", "IP Address", "DNS Name", "State", "Monitoring");
 
-	public InstancesGui(List<Instance> list) {
+	public InstancesGui(List<Map<String,String>> list) {
 		setBounds(new Rectangle(100, 100, 600, 300));
 		setTitle("EC2 Instances");
 		DefaultTableModel model = new DefaultTableModel();
@@ -36,21 +43,22 @@ public class InstancesGui extends ConfigurationFrame {
 			model.addColumn(title);
 		}
 		
-		for (Instance i : list) {
-			String[] row = { 
-					i.getInstanceId(), 
-					i.getImageId(), 
-					i.getInstanceType(), 
-					i.getState().getName(),
-					i.getMonitoring().getState(), 
-					i.getPublicDnsName(), 
-					i.getPublicIpAddress() };
+		for (Map<String, String> map : list) {
+			int index = 0;
+			String[] row = new String[map.size()];
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				// TODO - The values should come out of the map in the order in
+				// which they were inserted. Otherwise, look at a LinkedHashMap
+				// or implement Comparable.
+				row[index++] = entry.getValue();
+				
+			}
 			model.addRow(row);
 		}
 		
 		this.table.setModel(model);
 		TableColumnModel tcm = this.table.getColumnModel();
-		tcm.getColumn(3).setCellRenderer(new IconTextCellRenderer());
+		tcm.getColumn(5).setCellRenderer(new IconTextCellRenderer());
 		
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -74,7 +82,12 @@ public class InstancesGui extends ConfigurationFrame {
 				int column) {
 			super.getTableCellRendererComponent(table, value, isSelected,
 					hasFocus, row, column);
-			String state = value.toString();
+			String state;
+			if (value == null) {
+				state = "";
+			} else {
+				state = value.toString();
+			}
 			setText(state);
 			if (state.equals("running")) {
 				setIcon(Utils.getIconImage("/assets/image/StatusGreen.png"));

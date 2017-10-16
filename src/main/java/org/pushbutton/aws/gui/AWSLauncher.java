@@ -14,6 +14,7 @@ import org.pushbutton.aws.App;
 import org.pushbutton.aws.gui.components.ColorMenuBar;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
+import org.pushbutton.utils.AWSConnector;
 import org.pushbutton.utils.SettingsManager;
 
 import java.awt.Color;
@@ -46,6 +47,7 @@ import javax.swing.SwingUtilities;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AWSLauncher extends JFrame {	
 	
@@ -64,19 +66,26 @@ public class AWSLauncher extends JFrame {
 	private FooterPanel footerPanel;
 	
 	private boolean awsInstanceUp = false;
-	private AmazonEC2 ec2;
 	private String instanceId;
 	private String ipAddress;
+	private AWSConnector connector;
 
 	/**
 	 * Create the frame.
+	 * @param instanceId
 	 */
-	public AWSLauncher() {
+	public AWSLauncher(String id) {
+		this.instanceId = id;		
+		connector = new AWSConnector();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 300);		
 		
 		createMenuBar();		
-		createContentPane();
+		createContentPane();		
+
+		startListeners();
+		checkInstanceAlreadyRunning();
 	}
 
 	private void createContentPane() {
@@ -137,29 +146,24 @@ public class AWSLauncher extends JFrame {
 		menuBar.add(mnOptions);
 		
 		mntmSettings = new JMenuItem("Settings");
-		mntmSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mntmSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+				InputEvent.CTRL_MASK));
 		mnOptions.add(mntmSettings);
-		
+
 		mntmEcInstances = new JMenuItem("EC2 Instances");
-		mntmEcInstances.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+		mntmEcInstances.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+				InputEvent.CTRL_MASK));
 		mnOptions.add(mntmEcInstances);
 	}
 
-	public void checkInstanceAlreadyRunning(String id) {
-		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
-		DescribeInstancesResult response = ec2.describeInstances(request);
+	public void checkInstanceAlreadyRunning() {
+		Map<String, String> instance = connector.getInstance(instanceId);
 		
-		List<Reservation> reservations = response.getReservations();
-		assert(reservations.size() == 1);
-		
-		List<Instance> instances = reservations.get(0).getInstances();
-		assert(instances.size() == 1);
-		
-		String state = instances.get(0).getState().getName();
+		String state = instance.get("state");
 		if (state.equals("running")) {
 			awsInstanceUp = true;
 			footerPanel.updateStatus(getInstanceStatus());
-			footerPanel.setIPAddress(instances.get(0).getPublicIpAddress());
+			footerPanel.setIPAddress(instance.get("ipAddress"));
 
 			// If its already running toggle the start and stop buttons.
 			btnStart.setEnabled(!btnStart.isEnabled());
@@ -173,16 +177,9 @@ public class AWSLauncher extends JFrame {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				btnStart.setEnabled(false);
 				
-				// Since we added the ability to change the instance ID, it
-				// would be nice to check for an updated value. Since we have no
-				// way to do that, just get it again from the properties.
-				instanceId = SettingsManager.getProperties().getProperty(
-						"instanceId");
-				
-				StartInstancesRequest request = new StartInstancesRequest()
-						.withInstanceIds(instanceId);
-				StartInstancesResult result = ec2.startInstances(request);
-				result.getStartingInstances();
+				// TODO - Do we need to check for a new value of instance ID? If
+				// it was just changed?
+				connector.startInstance(instanceId);
 				
 				// Poll for status change and update our indicators.
 				checkStatus("running");
@@ -196,14 +193,11 @@ public class AWSLauncher extends JFrame {
 		
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnStop.setEnabled(false);
-				
-				StopInstancesRequest request = new StopInstancesRequest()
-						.withInstanceIds(instanceId);
-				StopInstancesResult result = ec2.stopInstances(request);
-				result.getStoppingInstances();
+				btnStop.setEnabled(false);				
 				
 				// TODO - Should we check to make sure it's stopping?
+				connector.stopInstance(instanceId);
+				
 				checkStatus("stopping");
 				
 				awsInstanceUp = false;
@@ -221,41 +215,10 @@ public class AWSLauncher extends JFrame {
 		
 		mntmEcInstances.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				InstancesGui instances = new InstancesGui(getInstances(ec2));
+				InstancesGui instances = new InstancesGui(connector.getInstanceList());
 				instances.setVisible(true);
 			}
-		});
-		
-	}
-	
-	// TODO - This is the second instance of this method. Probably need to
-	// refactor it into a utility class. Also, I probably don't need to loop
-	// through all of the instances since I now know of the existence of
-	// DescribeInstanceStatus.
-	private List<Instance> getInstances(AmazonEC2 ec2) {
-		boolean done = false;
-		List<Instance> instanceList = new ArrayList<Instance>();
-		while (!done) {
-			DescribeInstancesRequest request = new DescribeInstancesRequest();
-			DescribeInstancesResult response = ec2.describeInstances(request);
-			
-			for (Reservation reservation : response.getReservations()) {
-				for (Instance instance : reservation.getInstances()) {
-					instanceList.add(instance);
-				}
-			}
-
-			request.setNextToken(response.getNextToken());
-
-			if (response.getNextToken() == null) {
-				done = true;
-			}
-		}
-		return instanceList;
-	}
-
-	public void setAwsClient(AmazonEC2 ec2) {
-		this.ec2 = ec2;
+		});		
 	}
 
 	public void setInstance(String instanceId) {
@@ -289,19 +252,11 @@ public class AWSLauncher extends JFrame {
 	private void loopUntilStateChanges(String targetState) {
 		boolean success = false;
 		while (!success) {
-			DescribeInstancesRequest request = new DescribeInstancesRequest();
-			DescribeInstancesResult response = ec2.describeInstances(request);
-			
-			for (Reservation reservation : response.getReservations()) {
-				for (Instance instance : reservation.getInstances()) {
-					if (instance.getInstanceId().equals(instanceId)) {
-						if (instance.getState().getName().equals(targetState)) {
-							ipAddress = instance.getPublicIpAddress();
-							success = true;
-							break;
-						}
-					}
-				}
+			if (connector.getInstance(instanceId).get("state")
+					.equals(targetState)) {
+				ipAddress = connector.getInstance(instanceId).get("ipAddress");
+				success = true;
+				break;
 			}
 		}
 
