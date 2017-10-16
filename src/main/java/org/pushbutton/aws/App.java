@@ -2,32 +2,15 @@ package org.pushbutton.aws;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import org.pushbutton.aws.gui.AWSLauncher;
-import org.pushbutton.aws.gui.LoginForm;
 import org.pushbutton.utils.SettingsManager;
-
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.auth.profile.ProfilesConfigFile;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
 
 public class App {
 
@@ -36,8 +19,8 @@ public class App {
 	 */
 	public static final ExecutorService TASKPOOL = Executors.newFixedThreadPool(2);
 	
-	private AWSLauncher launcherFrame;
 	private String instanceId;
+	private AWSLauncher launcherFrame;
 
 	/**
 	 * Launch the application.
@@ -55,7 +38,6 @@ public class App {
 			public void run() {
 				try {
 					App window = new App();
-					window.authenticate();
 					window.launcherFrame.setVisible(true);
 					window.launcherFrame.setResizable(false);
 				} catch (Exception e) {
@@ -72,93 +54,14 @@ public class App {
 		initialize();
 	}
 
-	private void authenticate() throws IOException {
-		String home = System.getProperty("user.home");
-		File configFile = new File(home, ".aws/credentials");
-		
-		if (!configFile.exists()) {
-			configFile.getParentFile().mkdirs();
-			configFile.createNewFile();
-		}
-		
-		try {
-			updateLauncher(configFile);
-		} catch (Exception ex) {
-			String noProfile = "No AWS profile";
-			String fileNotFound = "AWS credential profiles file not found";
-			if (ex instanceof IllegalArgumentException) {
-				if (ex.getMessage().startsWith(noProfile)
-						|| ex.getMessage().startsWith(fileNotFound)) {
-					doLogin(configFile);
-				}
-			} else {			
-				JOptionPane.showMessageDialog(this.launcherFrame, ex.getMessage(),
-						"Login Error", JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
 
-	private void doLogin(File configFile) {
-		LoginForm login = new LoginForm(launcherFrame, configFile);
-		login.setModal(true);
-		login.setVisible(true);
-		updateLauncher(configFile);
-	}
-
-	private void updateLauncher(File configFile) {
-		AmazonEC2 ec2 = getClient(configFile);
-		// TODO - So now that I know I can get these one at a time, there is no
-		// need to loop through all instances. Also, all the mutators on
-		// AWSLauncher are ridiculous!
-		for (Instance i : getInstances(ec2)) {
-			if (i.getInstanceId().equals(instanceId)) {
-				launcherFrame.setAwsClient(ec2);
-				launcherFrame.setInstance(i.getInstanceId());
-				launcherFrame.startListeners();
-				launcherFrame.checkInstanceAlreadyRunning(i.getInstanceId());
-				break;
-			}
-		}
-	}
-	
-	private AmazonEC2 getClient(File configFile) {
-		AWSCredentialsProvider provider = new ProfileCredentialsProvider(
-				new ProfilesConfigFile(configFile), "default");
-		AmazonEC2ClientBuilder builder = AmazonEC2ClientBuilder.standard()
-				.withCredentials(provider)
-				.withRegion(Regions.US_EAST_1);
-		return builder.build();
-	}
-	
-	private List<Instance> getInstances(AmazonEC2 ec2) {
-		boolean done = false;
-		List<Instance> instanceList = new ArrayList<Instance>();
-		while (!done) {
-			DescribeInstancesRequest request = new DescribeInstancesRequest();
-			DescribeInstancesResult response = ec2.describeInstances(request);
-			
-			for (Reservation reservation : response.getReservations()) {
-				for (Instance instance : reservation.getInstances()) {
-					instanceList.add(instance);
-				}
-			}
-
-			request.setNextToken(response.getNextToken());
-
-			if (response.getNextToken() == null) {
-				done = true;
-			}
-		}
-		return instanceList;
-	}
 	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {		
-		instanceId = SettingsManager.getProperties().getProperty("instanceId");
-		
-		launcherFrame = new AWSLauncher();
+		instanceId = SettingsManager.getProperties().getProperty("instanceId");		
+		launcherFrame = new AWSLauncher(instanceId);
 		launcherFrame.setBounds(100, 100, 450, 300);
 		launcherFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}

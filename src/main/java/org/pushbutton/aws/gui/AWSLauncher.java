@@ -11,8 +11,10 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 
 import org.pushbutton.aws.App;
+import org.pushbutton.aws.gui.components.ColorMenuBar;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
+import org.pushbutton.utils.AWSConnector;
 import org.pushbutton.utils.SettingsManager;
 
 import java.awt.Color;
@@ -21,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -39,41 +42,50 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class AWSLauncher extends JFrame {
+public class AWSLauncher extends JFrame {	
 	
-	/**
-	 * 
-	 */
+	public static final Color TXT_COLOR = Color.WHITE;
+	
 	private static final long serialVersionUID = -5754438927656452678L;
+	private static final Color BG_COLOR = Color.DARK_GRAY;
 	
 	private JPanel contentPane;
 	private JButton btnStart;
 	private JButton btnStop;
-	private JMenuBar menuBar;
+	private ColorMenuBar menuBar;
 	private JMenu mnOptions;
 	private JMenuItem mntmSettings;
 	private JMenuItem mntmEcInstances;
 	private FooterPanel footerPanel;
 	
 	private boolean awsInstanceUp = false;
-	private AmazonEC2 ec2;
 	private String instanceId;
 	private String ipAddress;
+	private AWSConnector connector;
 
 	/**
 	 * Create the frame.
+	 * @param instanceId
 	 */
-	public AWSLauncher() {
+	public AWSLauncher(String id) {
+		this.instanceId = id;		
+		connector = new AWSConnector();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 300);		
 		
 		createMenuBar();		
-		createContentPane();
+		createContentPane();		
+
+		startListeners();
+		checkInstanceAlreadyRunning();
 	}
 
 	private void createContentPane() {
@@ -81,6 +93,7 @@ public class AWSLauncher extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.setBackground(BG_COLOR);
 		
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
@@ -90,6 +103,7 @@ public class AWSLauncher extends JFrame {
 		gbl_panel.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
+		panel.setBackground(BG_COLOR);
 		
 		btnStart = new JButton("Start");
 		btnStart.setToolTipText("Start AWS Instance");
@@ -108,7 +122,7 @@ public class AWSLauncher extends JFrame {
 		btnStop.setPreferredSize(new Dimension(200, 200));
 		btnStop.setFont(new Font("Arial", Font.BOLD, 40));
 		btnStop.setBackground(Color.RED);
-		btnStop.setForeground(Color.WHITE);
+		btnStop.setForeground(TXT_COLOR);
 		GridBagConstraints gbc_btnStop = new GridBagConstraints();
 		gbc_btnStop.gridx = 1;
 		gbc_btnStop.gridy = 0;
@@ -117,41 +131,39 @@ public class AWSLauncher extends JFrame {
 		
 		footerPanel = new FooterPanel();
 		footerPanel.updateStatus(getInstanceStatus());
+		footerPanel.setBackground(BG_COLOR);
 		getContentPane().add(footerPanel, BorderLayout.SOUTH);
 	}
 
 	private void createMenuBar() {
-		menuBar = new JMenuBar();
+		menuBar = new ColorMenuBar();
+		menuBar.setColor(BG_COLOR);
 		setJMenuBar(menuBar);
 		
 		mnOptions = new JMenu("Options");
 		mnOptions.setMnemonic(KeyEvent.VK_O);
+		mnOptions.setForeground(TXT_COLOR);
 		menuBar.add(mnOptions);
 		
 		mntmSettings = new JMenuItem("Settings");
-		mntmSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mntmSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+				InputEvent.CTRL_MASK));
 		mnOptions.add(mntmSettings);
-		
+
 		mntmEcInstances = new JMenuItem("EC2 Instances");
-		mntmEcInstances.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+		mntmEcInstances.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+				InputEvent.CTRL_MASK));
 		mnOptions.add(mntmEcInstances);
 	}
 
-	public void checkInstanceAlreadyRunning(String id) {
-		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
-		DescribeInstancesResult response = ec2.describeInstances(request);
+	public void checkInstanceAlreadyRunning() {
+		Map<String, String> instance = connector.getInstance(instanceId);
 		
-		List<Reservation> reservations = response.getReservations();
-		assert(reservations.size() == 1);
-		
-		List<Instance> instances = reservations.get(0).getInstances();
-		assert(instances.size() == 1);
-		
-		String state = instances.get(0).getState().getName();
+		String state = instance.get("state");
 		if (state.equals("running")) {
 			awsInstanceUp = true;
 			footerPanel.updateStatus(getInstanceStatus());
-			footerPanel.setIPAddress(instances.get(0).getPublicIpAddress());
+			footerPanel.setIPAddress(instance.get("ipAddress"));
 
 			// If its already running toggle the start and stop buttons.
 			btnStart.setEnabled(!btnStart.isEnabled());
@@ -165,16 +177,9 @@ public class AWSLauncher extends JFrame {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				btnStart.setEnabled(false);
 				
-				// Since we added the ability to change the instance ID, it
-				// would be nice to check for an updated value. Since we have no
-				// way to do that, just get it again from the properties.
-				instanceId = SettingsManager.getProperties().getProperty(
-						"instanceId");
-				
-				StartInstancesRequest request = new StartInstancesRequest()
-						.withInstanceIds(instanceId);
-				StartInstancesResult result = ec2.startInstances(request);
-				result.getStartingInstances();
+				// TODO - Do we need to check for a new value of instance ID? If
+				// it was just changed?
+				connector.startInstance(instanceId);
 				
 				// Poll for status change and update our indicators.
 				checkStatus("running");
@@ -188,14 +193,11 @@ public class AWSLauncher extends JFrame {
 		
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnStop.setEnabled(false);
-				
-				StopInstancesRequest request = new StopInstancesRequest()
-						.withInstanceIds(instanceId);
-				StopInstancesResult result = ec2.stopInstances(request);
-				result.getStoppingInstances();
+				btnStop.setEnabled(false);				
 				
 				// TODO - Should we check to make sure it's stopping?
+				connector.stopInstance(instanceId);
+				
 				checkStatus("stopping");
 				
 				awsInstanceUp = false;
@@ -213,41 +215,10 @@ public class AWSLauncher extends JFrame {
 		
 		mntmEcInstances.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				InstancesGui instances = new InstancesGui(getInstances(ec2));
+				InstancesGui instances = new InstancesGui(connector.getInstanceList());
 				instances.setVisible(true);
 			}
-		});
-		
-	}
-	
-	// TODO - This is the second instance of this method. Probably need to
-	// refactor it into a utility class. Also, I probably don't need to loop
-	// through all of the instances since I now know of the existence of
-	// DescribeInstanceStatus.
-	private List<Instance> getInstances(AmazonEC2 ec2) {
-		boolean done = false;
-		List<Instance> instanceList = new ArrayList<Instance>();
-		while (!done) {
-			DescribeInstancesRequest request = new DescribeInstancesRequest();
-			DescribeInstancesResult response = ec2.describeInstances(request);
-			
-			for (Reservation reservation : response.getReservations()) {
-				for (Instance instance : reservation.getInstances()) {
-					instanceList.add(instance);
-				}
-			}
-
-			request.setNextToken(response.getNextToken());
-
-			if (response.getNextToken() == null) {
-				done = true;
-			}
-		}
-		return instanceList;
-	}
-
-	public void setAwsClient(AmazonEC2 ec2) {
-		this.ec2 = ec2;
+		});		
 	}
 
 	public void setInstance(String instanceId) {
@@ -281,19 +252,11 @@ public class AWSLauncher extends JFrame {
 	private void loopUntilStateChanges(String targetState) {
 		boolean success = false;
 		while (!success) {
-			DescribeInstancesRequest request = new DescribeInstancesRequest();
-			DescribeInstancesResult response = ec2.describeInstances(request);
-			
-			for (Reservation reservation : response.getReservations()) {
-				for (Instance instance : reservation.getInstances()) {
-					if (instance.getInstanceId().equals(instanceId)) {
-						if (instance.getState().getName().equals(targetState)) {
-							ipAddress = instance.getPublicIpAddress();
-							success = true;
-							break;
-						}
-					}
-				}
+			if (connector.getInstance(instanceId).get("state")
+					.equals(targetState)) {
+				ipAddress = connector.getInstance(instanceId).get("ipAddress");
+				success = true;
+				break;
 			}
 		}
 

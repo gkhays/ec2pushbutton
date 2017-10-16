@@ -7,6 +7,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolTip;
 import javax.swing.border.Border;
 
+import org.pushbutton.aws.gui.AWSLauncher;
 import org.pushbutton.utils.Utils;
 
 import java.awt.Color;
@@ -54,6 +55,7 @@ public class FooterPanel extends JPanel {
 		add(statusLED);
 		
 		JLabel lblInstanceStatus = new JLabel("AWS Instance Status");
+		lblInstanceStatus.setForeground(AWSLauncher.TXT_COLOR);
 		add(lblInstanceStatus);		
 		
 		ipAddress = new JTextField("255.255.255.255");

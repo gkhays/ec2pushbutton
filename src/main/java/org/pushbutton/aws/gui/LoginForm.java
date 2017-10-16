@@ -35,13 +35,8 @@ public class LoginForm extends JDialog {
 	
 	@SuppressWarnings("unused")
 	private File configFile;
-
-	/**
-	 * Create the dialog.
-	 * @param launcherFrame 
-	 * @param configFile 
-	 */
-	public LoginForm(JFrame launcherFrame, final File configFile) {
+	
+	public LoginForm(final File configFile) {
 		this.configFile = configFile;
 		
 		setBounds(100, 100, 420, 170);
@@ -92,8 +87,6 @@ public class LoginForm extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					System.out.println("Credential cache: "
-							+ configFile.getAbsolutePath());
 					if (configFile.exists()) {
 						Wini ini = new Wini(configFile);
 						ini.add("default", "aws_access_key_id", key.getText());
