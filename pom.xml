@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pushbutton</groupId>
 	<artifactId>pushbutton</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<name>EC2PushButton</name>
 	<description>Start and stop a given EC2 instance</description><url>https://github.com/gkhays/ec2pushbutton</url>
 
