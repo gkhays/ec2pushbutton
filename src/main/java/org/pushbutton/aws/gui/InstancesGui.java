@@ -36,6 +36,7 @@ public class InstancesGui extends ConfigurationFrame {
 	public InstancesGui(List<Map<String,String>> list) {
 		setBounds(new Rectangle(100, 100, 600, 300));
 		setTitle("EC2 Instances");
+		setLocationRelativeTo(null);
 		DefaultTableModel model = new DefaultTableModel();
 		for (String title : headers) {
 			model.addColumn(title);
