@@ -9,20 +9,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.pushbutton.aws.gui.components.ConfigurationFrame;
-import org.pushbutton.utils.Utils;
-
-<<<<<<< HEAD
-=======
-import org.pushbutton.aws.gui.components.ConfigurationFrame;
-
-import com.amazonaws.services.ec2.model.Instance;
-
->>>>>>> refs/remotes/origin/master
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import org.pushbutton.aws.gui.components.ConfigurationFrame;
+import org.pushbutton.utils.Utils;
 
 public class InstancesGui extends ConfigurationFrame {
 
