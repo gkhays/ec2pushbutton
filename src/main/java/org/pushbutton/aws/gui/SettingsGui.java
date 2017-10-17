@@ -28,10 +28,10 @@ public class SettingsGui extends ConfigurationFrame {
 	private Map<String, String> changedEntries;
 
 	public SettingsGui() {
+		setTitle("Configuration Settings");
 		btnOk.setToolTipText("Save property changes");
 		this.properties = SettingsManager.getProperties();
 		changedEntries = new HashMap<String, String>();
-		setTitle("Configuration Settings");
 		model = new DefaultTableModel();
 		model.addColumn("Property");
 		model.addColumn("Value");
