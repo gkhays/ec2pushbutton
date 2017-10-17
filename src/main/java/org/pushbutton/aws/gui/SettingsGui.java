@@ -4,8 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -16,25 +18,24 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.pushbutton.aws.IdChangeListener;
 import org.pushbutton.aws.gui.components.ConfigurationFrame;
 import org.pushbutton.utils.SettingsManager;
 
 public class SettingsGui extends ConfigurationFrame {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 670290632895590534L;
 	
 	private DefaultTableModel model;
 	private Properties properties;
 	private Map<String, String> changedEntries;
+	private List<IdChangeListener> listeners = new ArrayList<IdChangeListener>();
 
 	public SettingsGui() {
+		setTitle("Configuration Settings");
 		btnOk.setToolTipText("Save property changes");
 		this.properties = SettingsManager.getProperties();
 		changedEntries = new HashMap<String, String>();
-		setTitle("Configuration Settings");
 		model = new DefaultTableModel();
 		model.addColumn("Property");
 		model.addColumn("Value");
@@ -77,12 +78,21 @@ public class SettingsGui extends ConfigurationFrame {
 	}
 	
 	private void saveTable() {
+		String instanceId = null;
 		for (Map.Entry<String, String> entry : changedEntries.entrySet()) {
 			SettingsManager.getProperties().setProperty(
 					entry.getKey(), entry.getValue());
 
 			try {
+				if (changedEntries.containsKey("instanceId")) {
+					instanceId = changedEntries.get("instanceId");
+				}
 				SettingsManager.saveProperties();
+				for (IdChangeListener l : listeners) {
+					if (instanceId != null && !instanceId.isEmpty()) {
+						l.instanceChanged(instanceId);
+					}
+				}
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -91,6 +101,10 @@ public class SettingsGui extends ConfigurationFrame {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void addListener(IdChangeListener idListener) {
+		listeners.add(idListener);
 	}
 
 }

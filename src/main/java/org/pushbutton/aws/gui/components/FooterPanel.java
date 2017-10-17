@@ -21,10 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 public class FooterPanel extends JPanel {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -3921870443019118823L;
 	
 	public enum Status {
@@ -38,6 +35,10 @@ public class FooterPanel extends JPanel {
 	public FooterPanel() {
 		setToolTipText("Server IP Address");
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JLabel lblInstanceStatus = new JLabel("AWS Instance Status");
+		lblInstanceStatus.setForeground(AWSLauncher.TXT_COLOR);
+		add(lblInstanceStatus);
 		
 		statusLED = new JLabel(
 				Utils.getIconImage("/assets/image/StatusWhite.png")) {
@@ -53,10 +54,6 @@ public class FooterPanel extends JPanel {
 		statusLED.setBorder(BorderFactory.createEmptyBorder());
 		statusLED.setToolTipText("Check AWS Instance Status");
 		add(statusLED);
-		
-		JLabel lblInstanceStatus = new JLabel("AWS Instance Status");
-		lblInstanceStatus.setForeground(AWSLauncher.TXT_COLOR);
-		add(lblInstanceStatus);		
 		
 		ipAddress = new JTextField("255.255.255.255");
 		ipAddress.setToolTipText("Server IP address");
@@ -85,11 +82,15 @@ public class FooterPanel extends JPanel {
             case ONLINE:
             	statusLED.setToolTipText("AWS instance is online!");
             	statusLED.setIcon(Utils.getIconImage("/assets/image/StatusGreen.png"));
+            	statusLED.setText("Running");
+            	statusLED.setForeground(Color.GREEN);
             	ipAddress.setEnabled(true);
                 break;
             case OFFLINE:
             	statusLED.setToolTipText("AWS instance is offline");
             	statusLED.setIcon(Utils.getIconImage("/assets/image/StatusRed.png"));
+            	statusLED.setText("Stopped");
+            	statusLED.setForeground(AWSLauncher.TXT_COLOR);
             	ipAddress.setEnabled(false);
             	// TODO - Is there any point in leaving the copy button enabled?
                 break;

@@ -6,10 +6,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import org.pushbutton.aws.gui.AWSLauncher;
+import org.pushbutton.aws.gui.SplashScreen;
 import org.pushbutton.utils.SettingsManager;
 
 public class App {
@@ -19,6 +21,8 @@ public class App {
 	 */
 	public static final ExecutorService TASKPOOL = Executors.newFixedThreadPool(2);
 	
+	public static final SplashScreen splash = new SplashScreen();
+	
 	private String instanceId;
 	private AWSLauncher launcherFrame;
 
@@ -26,6 +30,12 @@ public class App {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				splash.setVisible(true);
+			}
+		});
+		
 		// Set the look and feel.
 		try {
 			setLaF();
@@ -45,6 +55,8 @@ public class App {
 				}
 			}
 		});
+		
+		//splash.close();
 	}
 
 	/**
@@ -60,9 +72,10 @@ public class App {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {		
-		instanceId = SettingsManager.getProperties().getProperty("instanceId");		
+		instanceId = SettingsManager.getProperties().getProperty("instanceId");
 		launcherFrame = new AWSLauncher(instanceId);
 		launcherFrame.setBounds(100, 100, 450, 300);
+		launcherFrame.setLocationRelativeTo(null);
 		launcherFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	

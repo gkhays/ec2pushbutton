@@ -9,17 +9,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.pushbutton.aws.gui.components.ConfigurationFrame;
-import org.pushbutton.utils.Utils;
-
-import org.pushbutton.aws.gui.components.ConfigurationFrame;
-
-import com.amazonaws.services.ec2.model.Instance;
-
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import org.pushbutton.aws.gui.components.ConfigurationFrame;
+import org.pushbutton.utils.Utils;
 
 public class InstancesGui extends ConfigurationFrame {
 
@@ -40,6 +36,7 @@ public class InstancesGui extends ConfigurationFrame {
 	public InstancesGui(List<Map<String,String>> list) {
 		setBounds(new Rectangle(100, 100, 600, 300));
 		setTitle("EC2 Instances");
+		setLocationRelativeTo(null);
 		DefaultTableModel model = new DefaultTableModel();
 		for (String title : headers) {
 			model.addColumn(title);

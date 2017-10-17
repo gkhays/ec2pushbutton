@@ -40,7 +40,7 @@ public class AWSConnector {
 		}
 	}
 
-	public Map<String, String> getInstance(String id) {
+	public Map<String, String> getInstance(String id) throws Exception {
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
 		DescribeInstancesResult response = ec2.describeInstances(request);
 		

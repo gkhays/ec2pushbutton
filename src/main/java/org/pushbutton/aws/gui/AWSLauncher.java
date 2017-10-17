@@ -11,47 +11,32 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 
 import org.pushbutton.aws.App;
+import org.pushbutton.aws.IdChangeListener;
 import org.pushbutton.aws.gui.components.ColorMenuBar;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
 import org.pushbutton.utils.AWSConnector;
-import org.pushbutton.utils.SettingsManager;
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.StartInstancesRequest;
-import com.amazonaws.services.ec2.model.StartInstancesResult;
-import com.amazonaws.services.ec2.model.StopInstancesRequest;
-import com.amazonaws.services.ec2.model.StopInstancesResult;
-
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-
 import java.awt.event.InputEvent;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public class AWSLauncher extends JFrame {	
+public class AWSLauncher extends JFrame implements IdChangeListener {	
 	
 	public static final Color TXT_COLOR = Color.WHITE;
+	public static final String APP_NAME = "EC2 Push Button";
 	
 	private static final long serialVersionUID = -5754438927656452678L;
 	private static final Color BG_COLOR = Color.DARK_GRAY;
@@ -78,14 +63,27 @@ public class AWSLauncher extends JFrame {
 		this.instanceId = id;		
 		connector = new AWSConnector();
 		
+		setTitle(APP_NAME + " (" + instanceId + ")");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);		
 		
 		createMenuBar();		
-		createContentPane();		
-
+		createContentPane();
 		startListeners();
-		checkInstanceAlreadyRunning();
+		
+		try {
+			checkInstanceAlreadyRunning();
+		} catch (Exception e) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("<html><body><p style='width: 300px;'>");
+			builder.append("The instance ID is not correct. " + e.getMessage());
+			builder.append("</p></body></html>");
+			String message = builder.toString();
+			JOptionPane.showMessageDialog(this, message, "Instance Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		
+		App.splash.close();
 	}
 
 	private void createContentPane() {
@@ -156,7 +154,7 @@ public class AWSLauncher extends JFrame {
 		mnOptions.add(mntmEcInstances);
 	}
 
-	public void checkInstanceAlreadyRunning() {
+	public void checkInstanceAlreadyRunning() throws Exception {
 		Map<String, String> instance = connector.getInstance(instanceId);
 		
 		String state = instance.get("state");
@@ -170,15 +168,18 @@ public class AWSLauncher extends JFrame {
 			btnStop.setEnabled(!btnStop.isEnabled());
 		}
 	}
+
+	public void instanceChanged(String id) {
+		this.instanceId = id;
+		this.setTitle(APP_NAME + " (" + instanceId + ")");
+	}
 	
 	public void startListeners() {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				btnStart.setEnabled(false);
+				btnStart.setEnabled(false);				
 				
-				// TODO - Do we need to check for a new value of instance ID? If
-				// it was just changed?
 				connector.startInstance(instanceId);
 				
 				// Poll for status change and update our indicators.
@@ -209,8 +210,9 @@ public class AWSLauncher extends JFrame {
 		mntmSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SettingsGui settings = new SettingsGui();
+				settings.addListener(AWSLauncher.this);
 				settings.setVisible(true);
-			}			
+			}
 		});
 		
 		mntmEcInstances.addActionListener(new ActionListener() {
@@ -252,11 +254,16 @@ public class AWSLauncher extends JFrame {
 	private void loopUntilStateChanges(String targetState) {
 		boolean success = false;
 		while (!success) {
-			if (connector.getInstance(instanceId).get("state")
-					.equals(targetState)) {
-				ipAddress = connector.getInstance(instanceId).get("ipAddress");
-				success = true;
-				break;
+			try {
+				if (connector.getInstance(instanceId).get("state")
+						.equals(targetState)) {
+					ipAddress = connector.getInstance(instanceId).get(
+							"ipAddress");
+					success = true;
+					break;
+				}
+			} catch (Exception e) {
+				return;
 			}
 		}
 
