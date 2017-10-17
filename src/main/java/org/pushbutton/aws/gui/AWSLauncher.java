@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 
 import org.pushbutton.aws.App;
+import org.pushbutton.aws.IdChangeListener;
 import org.pushbutton.aws.gui.components.ColorMenuBar;
 import org.pushbutton.aws.gui.components.FooterPanel;
 import org.pushbutton.aws.gui.components.FooterPanel.Status;
@@ -50,7 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AWSLauncher extends JFrame {	
+public class AWSLauncher extends JFrame implements IdChangeListener {	
 	
 	public static final Color TXT_COLOR = Color.WHITE;
 	public static final String APP_NAME = "EC2 Push Button";
@@ -185,15 +186,18 @@ public class AWSLauncher extends JFrame {
 			btnStop.setEnabled(!btnStop.isEnabled());
 		}
 	}
+
+	public void instanceChanged(String id) {
+		this.instanceId = id;
+		this.setTitle(APP_NAME + " (" + instanceId + ")");
+	}
 	
 	public void startListeners() {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				btnStart.setEnabled(false);
+				btnStart.setEnabled(false);				
 				
-				// TODO - Do we need to check for a new value of instance ID? If
-				// it was just changed?
 				connector.startInstance(instanceId);
 				
 				// Poll for status change and update our indicators.
@@ -224,6 +228,7 @@ public class AWSLauncher extends JFrame {
 		mntmSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SettingsGui settings = new SettingsGui();
+				settings.addListener(AWSLauncher.this);
 				settings.setVisible(true);
 			}
 		});
