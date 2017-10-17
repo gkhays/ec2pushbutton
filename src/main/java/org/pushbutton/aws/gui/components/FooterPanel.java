@@ -21,10 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 public class FooterPanel extends JPanel {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -3921870443019118823L;
 	
 	public enum Status {
@@ -92,7 +89,8 @@ public class FooterPanel extends JPanel {
             case OFFLINE:
             	statusLED.setToolTipText("AWS instance is offline");
             	statusLED.setIcon(Utils.getIconImage("/assets/image/StatusRed.png"));
-            	statusLED.setText("Stopped");            	
+            	statusLED.setText("Stopped");
+            	statusLED.setForeground(AWSLauncher.TXT_COLOR);
             	ipAddress.setEnabled(false);
             	// TODO - Is there any point in leaving the copy button enabled?
                 break;
