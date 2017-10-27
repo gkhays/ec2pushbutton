@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gkhays/ec2pushbutton.svg?branch=master)](https://github.com/gkhays/ec2pushbutton)
+
 # EC2PushButton
 
 Simple one button touch to start and stop a given EC2 instance.
