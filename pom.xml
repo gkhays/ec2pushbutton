@@ -112,7 +112,7 @@
 							</classPath>
 							<jre>
 								<minVersion>1.8.0</minVersion>
-								<runtimeBits>64/32</runtimeBits>
+								<runtimeBits>32</runtimeBits>
 							</jre>
 						</configuration>
 						<goals>
