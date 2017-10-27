@@ -1,1 +1,5 @@
 language: java
+sudo: required
+before_script:
+	- sudo apt-get update
+	- sudo apt-get install lib lib32z1 lib32ncurses5
