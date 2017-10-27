@@ -5,4 +5,4 @@ jdk:
 before_script:
   - echo "Updating libraries..."
   - sudo apt-get update
-  - sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 zlib.i686 ncurses-libs.i686 bzip2-libs.i686
+  - sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 zlib1g bzip2
