@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pushbutton</groupId>
 	<artifactId>pushbutton</artifactId>
-	<version>0.5.0</version>
+	<version>0.6.0</version>
 	<name>EC2PushButton</name>
 	<description>Start and stop a given EC2 instance</description><url>https://github.com/gkhays/ec2pushbutton</url>
 
 	<properties>
-		<jdk.version>1.6</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		<mainClass>org.pushbutton.aws.App</mainClass>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties><dependencies>
