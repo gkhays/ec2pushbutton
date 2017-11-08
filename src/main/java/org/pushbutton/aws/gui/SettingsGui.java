@@ -35,6 +35,7 @@ public class SettingsGui extends ConfigurationFrame {
 		setTitle("Configuration Settings");
 		btnOk.setToolTipText("Save property changes");
 		this.properties = SettingsManager.getProperties();
+		this.properties.putAll(SettingsManager.getDefaultProperties());
 		changedEntries = new HashMap<String, String>();
 		model = new DefaultTableModel();
 		model.addColumn("Property");
@@ -93,9 +94,6 @@ public class SettingsGui extends ConfigurationFrame {
 						l.instanceChanged(instanceId);
 					}
 				}
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

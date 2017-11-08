@@ -35,10 +35,10 @@ import java.util.Map;
 
 public class AWSLauncher extends JFrame implements IdChangeListener {	
 	
+	private static final long serialVersionUID = -5754438927656452678L;
+	
 	public static final Color TXT_COLOR = Color.WHITE;
 	public static final String APP_NAME = "EC2 Push Button";
-	
-	private static final long serialVersionUID = -5754438927656452678L;
 	private static final Color BG_COLOR = Color.DARK_GRAY;
 	
 	private JPanel contentPane;
