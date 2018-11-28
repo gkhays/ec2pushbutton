@@ -1,4 +1,4 @@
-[![Download](https://img.shields.io/github/release/ec2pushbutton.svg)](https://github.com/gkhays/ec2pushbutton/releases/) [![Build Status](https://travis-ci.org/gkhays/ec2pushbutton.svg?branch=master)](https://github.com/gkhays/ec2pushbutton)
+[![Download](https://img.shields.io/github/release/gkhays/ec2pushbutton.svg)](https://github.com/gkhays/ec2pushbutton/releases/) [![Build Status](https://travis-ci.org/gkhays/ec2pushbutton.svg?branch=master)](https://github.com/gkhays/ec2pushbutton)
 
 # EC2PushButton
 
